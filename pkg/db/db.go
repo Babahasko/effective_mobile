@@ -1,7 +1,7 @@
 package db
 
 import (
-	"github.com/Babahasko/stat_api/configs"
+	"effective_mobile/config"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -11,8 +11,8 @@ type Db struct{
 	*gorm.DB
 }
 
-func NewDB(conf *configs.Config) *Db {
-	db, err := gorm.Open(postgres.Open(conf.DB.Dsn),  &gorm.Config{})
+func NewDB(conf *config.DatabaseConfig) *Db {
+	db, err := gorm.Open(postgres.Open(conf.Url),  &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}

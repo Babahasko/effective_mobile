@@ -1,0 +1,67 @@
+package config
+
+import (
+	"log"
+	"os"
+	"strconv"
+
+	"github.com/joho/godotenv"
+)
+
+func Init() {
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file")
+		return
+	}
+	log.Println(".env file loaded")
+}
+
+type DatabaseConfig struct {
+	Url string
+}
+
+func NewDatabaseConfig() *DatabaseConfig{
+	return &DatabaseConfig{
+		Url: getString("DB_URL", "localhost"),
+	}
+}
+
+type LogConfig struct {
+	Level int
+	Format string
+	LevelStr string
+}
+
+func NewLogConfig() *LogConfig{
+	return &LogConfig{
+		Level: getInt("LOG_LEVEL", 0),
+		LevelStr: getString("LOG_LEVEL_STR", "info"),
+		Format: getString("LOG_FORMAT", "json"),
+	}
+}
+
+func getString(key, defaultValue string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		value = defaultValue
+	}
+	return value
+}
+
+func getInt(key string, defaultValue int) int {
+	value := os.Getenv(key)
+	i, err := strconv.Atoi(value)
+	if err != nil {
+		return defaultValue
+	}
+	return i
+}
+
+func getBool(key string, defaultValue bool) bool {
+	value := os.Getenv(key)
+	b, err := strconv.ParseBool(value)
+	if err != nil {
+		return defaultValue
+	}
+	return b
+}

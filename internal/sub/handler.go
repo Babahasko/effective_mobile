@@ -2,12 +2,18 @@ package sub
 
 import "net/http"
 
-type SubscriptionHandlerDeps struct {}
+type SubscriptionHandlerDeps struct {
+	SubRepo *SubscriptionRepository
+}
 
-type SubscriptionHandler struct {}
+type SubscriptionHandler struct {
+	SubRepo *SubscriptionRepository
+}
 
 func NewSubscriptionHandler(router *http.ServeMux, deps *SubscriptionHandlerDeps) {
-	handler := &SubscriptionHandler{}
+	handler := &SubscriptionHandler{
+		SubRepo: deps.SubRepo,
+	}
 
 	router.Handle("POST /sub", handler.Create())
 	router.Handle("GET /sub/{id}", handler.Read())

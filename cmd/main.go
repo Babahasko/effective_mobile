@@ -2,24 +2,25 @@ package main
 
 import (
 	"effective_mobile/config"
+	"effective_mobile/internal/sub"
 	"effective_mobile/logger"
+	"effective_mobile/pkg/db"
 	"net/http"
 )
-func App() http.Handler{
-	
-	// db := db.NewDB(conf)
+
+func App(conf *config.DatabaseConfig) http.Handler {
+
+	db := db.NewDB(conf)
 	router := http.NewServeMux()
 
 	//Repositories
-	// subRepository := link.NewLinkRepository(db)
+	subRepository := sub.NewSubscriptionRepository(db)
 	// statRepository := stat.NewStatRepository(db) // пока под вопросом
 
 	// Handler
-	// sub.NewSubHandler(router, link.LinkHandlerDeps{
-	// 	LinkRepository: subRepository,
-	// 	Config:         conf,
-	// 	EventBus:       eventBus, ? nтоже под вопросом
-	// })
+	sub.NewSubscriptionHandler(router, &sub.SubscriptionHandlerDeps{
+		SubRepo: subRepository,
+	})
 	// stat.NewStatHandler(router, &stat.StatHandlerDeps{
 	// 	StatRepository: statRepository,
 	// }) ? пока под вопросом
@@ -35,11 +36,12 @@ func main() {
 	// Config
 	config.Init()
 	logConfig := config.NewLogConfig()
+	databaseConfig := config.NewDatabaseConfig()
 
 	// Logger
 	customLogger := logger.NewLogger(logConfig)
 
-	app := App()
+	app := App(databaseConfig)
 	server := http.Server{
 		Addr:    ":8081",
 		Handler: app,
@@ -50,7 +52,7 @@ func main() {
 	err := server.ListenAndServe()
 	if err != nil {
 		customLogger.Error().
-		Err(err).
-		Msg("Server failed to start")
+			Err(err).
+			Msg("Server failed to start")
 	}
 }

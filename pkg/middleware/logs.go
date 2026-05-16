@@ -26,6 +26,6 @@ func Logging(next http.Handler) http.Handler {
         if json.Valid(body) {
             event = event.RawJSON("response", body)
         }
-        event.Msg("request")
+        event.Send()
 	})
 }

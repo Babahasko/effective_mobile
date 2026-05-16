@@ -3,7 +3,11 @@ package sub
 import (
 	"effective_mobile/pkg/req"
 	"effective_mobile/pkg/res"
+	"errors"
 	"net/http"
+	"strconv"
+
+	"gorm.io/gorm"
 )
 
 type SubscriptionHandlerDeps struct {
@@ -50,10 +54,27 @@ func (handler *SubscriptionHandler) Create() http.HandlerFunc {
 }
 func (handler *SubscriptionHandler) Read() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		idString := r.PathValue("id")
+		id, err := strconv.ParseUint(idString, 10, 32)
+		if err != nil {
+			res.JsonError(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		sub, err := handler.SubRepo.Read(id)
+		if err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				res.JsonError(w, "subscription not found", http.StatusNotFound)
+				return
+			}
+			res.JsonError(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		res.Json(w, sub, http.StatusOK)
 	}
 }
 func (handler *SubscriptionHandler) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		
 	}
 }
 func (handler *SubscriptionHandler) Delete() http.HandlerFunc {

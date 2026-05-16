@@ -57,6 +57,27 @@ func (repo *SubscriptionRepository) Delete(id uint) error {
 	return nil
 }
 
+func (repo *SubscriptionRepository) List(filter *SubscriptionFilter) ([]*Subscription, error) {
+    var subs []*Subscription
+    query := repo.Database.DB.Model(&Subscription{})
+
+    if filter.UserID != nil {
+        query = query.Where("user_id = ?", filter.UserID)
+    }
+    if filter.ServiceName != nil {
+        query = query.Where("service_name = ?", filter.ServiceName)
+    }
+    if filter.Price != nil {
+        query = query.Where("price = ?", filter.Price)
+    }
+    if filter.StartDate != nil {
+        query = query.Where("start_date = ?", filter.StartDate)
+    }
+
+    result := query.Find(&subs)
+    return subs, result.Error
+}
+
 func (repo *SubscriptionRepository) Exists(serviceName string, userID uuid.UUID) (bool, error) {
     var count int64
     err := repo.Database.Model(&Subscription{}).

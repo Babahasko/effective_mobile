@@ -38,6 +38,7 @@ func (handler *SubscriptionHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		body, err := req.HandleBody[SubscriptionCreateRequest](r)
 		if err != nil {
+			res.JsonError(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 		model, err := body.ToModel()
@@ -50,7 +51,7 @@ func (handler *SubscriptionHandler) Create() http.HandlerFunc {
 			res.JsonError(w, err.Error(), http.StatusConflict)
 			return
 		}
-		res.Json(w, createdSubscription, 201)
+		res.Json(w, createdSubscription, http.StatusOK)
 	}
 }
 func (handler *SubscriptionHandler) Read() http.HandlerFunc {
@@ -134,5 +135,16 @@ func (handler *SubscriptionHandler) Delete() http.HandlerFunc {
 }
 func (handler *SubscriptionHandler) List() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-	}
+        filter, err := FilterFromQuery(r)
+        if err != nil {
+            res.JsonError(w, err.Error(), http.StatusBadRequest)
+            return
+        }
+        subs, err := handler.SubRepo.List(filter)
+        if err != nil {
+            res.JsonError(w, err.Error(), http.StatusInternalServerError)
+            return
+        }
+        res.Json(w, subs, http.StatusOK)
+    }
 }

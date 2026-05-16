@@ -38,6 +38,7 @@ paths:
 
     get:
       summary: Список подписок
+      description: Возвращает список подписок с фильтрацией по переданным параметрам. Если ни один параметр не указан — возвращает все подписки.
       parameters:
         - in: query
           name: user_id
@@ -66,10 +67,23 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/SubscriptionResponse'
+        '400':
+          description: Ошибка в параметрах запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Ошибка на стороне сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInternal'
 
   /sub/total:
     get:
       summary: Суммарная стоимость подписок
+      description: Возвращает суммарную стоимость подписок с фильтрацией по переданным параметрам. Если ни один параметр не указан — возвращает суммарную стоимость всех подписок.
       parameters:
         - in: query
           name: user_id
@@ -91,10 +105,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TotalResponse'
+        '400':
+          description: Ошибка в параметрах запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Ошибка на стороне сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInternal'
+        
 
   /sub/{id}:
     get:
-      summary: Получить подписку
+      summary: Получить подписку по Id
       parameters:
         - in: path
           name: id
@@ -108,8 +135,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SubscriptionResponse'
+        '400':
+          description: Ошибка в параметрах запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Не найдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSubscriptionNotFound'
+        '500':
+          description: Ошибка на стороне сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInternal'
 
     patch:
       summary: Обновить подписку
@@ -131,6 +174,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SubscriptionResponse'
+        '400':
+          description: Ошибка в параметрах запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Подписка по id не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSubscriptionNotFound'
+        '500':
+          description: Ошибка на стороне сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInternal'
 
     delete:
       summary: Удалить подписку
@@ -143,6 +204,29 @@ paths:
       responses:
         '200':
           description: Удалено
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "subscription id: 1 deleted"
+        '400':
+          description: Ошибка в параметрах запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Не найдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSubscriptionNotFound'
+        '500':
+          description: Ошибка на стороне сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInternal'
 
 components:
   schemas:
@@ -210,9 +294,21 @@ components:
         error:
           type: string
           example: "start_date parse error"
+    ErrorInternal:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "database error"
     ErrorSubscriptionAlreadyExists:
       type: object
       properties:
         error:
           type: string
           example: "subscription already exists"
+    ErrorSubscriptionNotFound:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "subscription not found"

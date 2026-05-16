@@ -46,3 +46,28 @@ func (r *SubscriptionUpdateRequest) ToModel() (*Subscription, error) {
 		StartDate:   t,
 	}, nil
 }
+
+type SubscriptionResponse struct {
+    ID          uint      `json:"id"`
+    ServiceName string    `json:"service_name"`
+    UserID      uuid.UUID `json:"user_id"`
+    Price       uint      `json:"price"`
+    StartDate   string    `json:"start_date"`
+}
+
+type TotalResponse struct {
+    Total       uint       `json:"total"`
+    UserID      *uuid.UUID `json:"user_id,omitempty"`
+    ServiceName *string    `json:"service_name,omitempty"`
+    StartDate   *string    `json:"start_date,omitempty"`
+}
+
+func NewSubscriptionResponse(sub *Subscription) *SubscriptionResponse {
+    return &SubscriptionResponse{
+        ID:          sub.ID,
+        ServiceName: sub.ServiceName,
+        UserID:      sub.UserID,
+        Price:       sub.Price,
+        StartDate:   sub.StartDate.Format("01-2006"),
+    }
+}

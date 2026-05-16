@@ -78,6 +78,24 @@ func (repo *SubscriptionRepository) List(filter *SubscriptionFilter) ([]*Subscri
     return subs, result.Error
 }
 
+func (repo *SubscriptionRepository) Total(filter *SubscriptionFilter) (uint, error) {
+    var total uint
+    query := repo.Database.DB.Model(&Subscription{}).Select("COALESCE(SUM(price), 0)")
+
+    if filter.UserID != nil {
+        query = query.Where("user_id = ?", filter.UserID)
+    }
+    if filter.ServiceName != nil {
+        query = query.Where("service_name = ?", filter.ServiceName)
+    }
+    if filter.StartDate != nil {
+        query = query.Where("start_date >= ?", filter.StartDate)
+    }
+
+    result := query.Scan(&total)
+    return total, result.Error
+}
+
 func (repo *SubscriptionRepository) Exists(serviceName string, userID uuid.UUID) (bool, error) {
     var count int64
     err := repo.Database.Model(&Subscription{}).

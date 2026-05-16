@@ -26,12 +26,38 @@ func NewSubscriptionHandler(router *http.ServeMux, deps *SubscriptionHandlerDeps
 		SubRepo: deps.SubRepo,
 		SubService: deps.SubService,
 	}
-
+	router.Handle("GET /sub/total", handler.Total())
 	router.Handle("POST /sub", handler.Create())
 	router.Handle("GET /sub/{id}", handler.Read())
 	router.Handle("PATCH /sub/{id}", handler.Update())
 	router.Handle("DELETE /sub/{id}", handler.Delete())
 	router.Handle("GET /sub", handler.List())
+}
+
+func (handler *SubscriptionHandler) Total() http.HandlerFunc {
+    return func(w http.ResponseWriter, r *http.Request) {
+        filter, err := FilterFromQuery(r)
+        if err != nil {
+            res.JsonError(w, err.Error(), http.StatusBadRequest)
+            return
+        }
+        total, err := handler.SubRepo.Total(filter)
+        if err != nil {
+            res.JsonError(w, err.Error(), http.StatusInternalServerError)
+            return
+        }
+		var startDate *string
+		if filter.StartDate != nil {
+			formatted := filter.StartDate.Format("01-2006")
+			startDate = &formatted
+		}
+        res.Json(w, TotalResponse{
+			Total:       total,
+			UserID:      filter.UserID,
+			ServiceName: filter.ServiceName,
+			StartDate:   startDate,
+		}, http.StatusOK)
+    }
 }
 
 func (handler *SubscriptionHandler) Create() http.HandlerFunc {
@@ -51,7 +77,7 @@ func (handler *SubscriptionHandler) Create() http.HandlerFunc {
 			res.JsonError(w, err.Error(), http.StatusConflict)
 			return
 		}
-		res.Json(w, createdSubscription, http.StatusOK)
+		res.Json(w, NewSubscriptionResponse(createdSubscription), http.StatusOK)
 	}
 }
 func (handler *SubscriptionHandler) Read() http.HandlerFunc {
@@ -71,7 +97,7 @@ func (handler *SubscriptionHandler) Read() http.HandlerFunc {
 			res.JsonError(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		res.Json(w, sub, http.StatusOK)
+		res.Json(w, NewSubscriptionResponse(sub), http.StatusOK)
 	}
 }
 func (handler *SubscriptionHandler) Update() http.HandlerFunc {
@@ -110,7 +136,7 @@ func (handler *SubscriptionHandler) Update() http.HandlerFunc {
 			res.JsonError(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		res.Json(w, sub, http.StatusOK)
+		res.Json(w, NewSubscriptionResponse(sub), http.StatusOK)
 	}
 }
 func (handler *SubscriptionHandler) Delete() http.HandlerFunc {
@@ -145,6 +171,10 @@ func (handler *SubscriptionHandler) List() http.HandlerFunc {
             res.JsonError(w, err.Error(), http.StatusInternalServerError)
             return
         }
-        res.Json(w, subs, http.StatusOK)
+		response := make([]*SubscriptionResponse, len(subs))
+        for i, sub := range subs {
+            response[i] = NewSubscriptionResponse(sub)
+        }
+        res.Json(w, response, http.StatusOK)
     }
 }

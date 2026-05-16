@@ -83,7 +83,8 @@ func (handler *SubscriptionHandler) Create() http.HandlerFunc {
 func (handler *SubscriptionHandler) Read() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idString := r.PathValue("id")
-		id, err := strconv.ParseUint(idString, 10, 32)
+		parserdId, err := strconv.ParseUint(idString, 10, 32)
+		id := uint(parserdId)
 		if err != nil {
 			res.JsonError(w, err.Error(), http.StatusBadRequest)
 			return

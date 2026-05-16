@@ -35,7 +35,7 @@ func NewSubscriptionHandler(router *http.ServeMux, deps *SubscriptionHandlerDeps
 
 func (handler *SubscriptionHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		body, err := req.HandleBody[SubscriptionCreateRequest](&w, r)
+		body, err := req.HandleBody[SubscriptionCreateRequest](r)
 		if err != nil {
 			return
 		}
@@ -63,7 +63,7 @@ func (handler *SubscriptionHandler) Read() http.HandlerFunc {
 		sub, err := handler.SubRepo.Read(id)
 		if err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
-				res.JsonError(w, "subscription not found", http.StatusNotFound)
+				res.JsonError(w, ErrSubNotFound.Error(), http.StatusNotFound)
 				return
 			}
 			res.JsonError(w, err.Error(), http.StatusInternalServerError)
@@ -74,7 +74,41 @@ func (handler *SubscriptionHandler) Read() http.HandlerFunc {
 }
 func (handler *SubscriptionHandler) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		
+		idString := r.PathValue("id")
+		parsedid, err := strconv.ParseUint(idString, 10, 64)
+		id := uint(parsedid)
+		if err != nil {
+			res.JsonError(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		body, err := req.HandleBody[SubscriptionUpdateRequest](r)
+		if err != nil {
+			res.JsonError(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		model, err := body.ToModel()
+		if err != nil {
+			res.JsonError(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		sub, err := handler.SubRepo.Update(&Subscription{
+			ID: id,
+			ServiceName: model.ServiceName,
+			UserID: model.UserID,
+			Price: model.Price,
+			StartDate: model.StartDate,
+		})
+		if err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+                res.JsonError(w, ErrSubNotFound.Error(), http.StatusNotFound)
+                return
+            }
+			res.JsonError(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		res.Json(w, sub, http.StatusOK)
 	}
 }
 func (handler *SubscriptionHandler) Delete() http.HandlerFunc {

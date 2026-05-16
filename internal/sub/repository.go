@@ -4,6 +4,8 @@ import (
 	"effective_mobile/pkg/db"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type SubscriptionRepository struct {
@@ -30,6 +32,17 @@ func (repo *SubscriptionRepository) Read(id uint64) (*Subscription, error) {
 	if result.Error != nil {
 		return nil, result.Error
 	}
+	return sub, nil
+}
+
+func (repo *SubscriptionRepository) Update(sub *Subscription) (*Subscription, error) {
+	result := repo.Database.DB.Clauses(clause.Returning{}).Updates(sub)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	if result.RowsAffected == 0 {
+        return nil, gorm.ErrRecordNotFound
+    }
 	return sub, nil
 }
 

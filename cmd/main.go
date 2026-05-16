@@ -16,10 +16,13 @@ func App(conf *config.DatabaseConfig) http.Handler {
 	//Repositories
 	subRepository := sub.NewSubscriptionRepository(db)
 	// statRepository := stat.NewStatRepository(db) // пока под вопросом
+	//Services
+	subService := sub.NewSubscriptionService(subRepository)
 
 	// Handler
 	sub.NewSubscriptionHandler(router, &sub.SubscriptionHandlerDeps{
 		SubRepo: subRepository,
+		SubService: subService,
 	})
 	// stat.NewStatHandler(router, &stat.StatHandlerDeps{
 	// 	StatRepository: statRepository,

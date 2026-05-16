@@ -1,6 +1,10 @@
 package sub
 
-import "effective_mobile/pkg/db"
+import (
+	"effective_mobile/pkg/db"
+
+	"github.com/google/uuid"
+)
 
 type SubscriptionRepository struct {
 	Database *db.Db
@@ -18,4 +22,12 @@ func (repo *SubscriptionRepository) Create(sub *Subscription) (*Subscription, er
 		return nil, result.Error
 	}
 	return sub, nil
+}
+
+func (repo *SubscriptionRepository) Exists(serviceName string, userID uuid.UUID) (bool, error) {
+    var count int64
+    err := repo.Database.Model(&Subscription{}).
+        Where("service_name = ? AND user_id = ?", serviceName, userID).
+        Count(&count).Error
+    return count > 0, err
 }

@@ -8,15 +8,18 @@ import (
 
 type SubscriptionHandlerDeps struct {
 	SubRepo *SubscriptionRepository
+	SubService *SubscriptionService
 }
 
 type SubscriptionHandler struct {
 	SubRepo *SubscriptionRepository
+	SubService *SubscriptionService
 }
 
 func NewSubscriptionHandler(router *http.ServeMux, deps *SubscriptionHandlerDeps) {
 	handler := &SubscriptionHandler{
 		SubRepo: deps.SubRepo,
+		SubService: deps.SubService,
 	}
 
 	router.Handle("POST /sub", handler.Create())
@@ -37,7 +40,7 @@ func (handler *SubscriptionHandler) Create() http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusBadRequest)
             return
 		}
-		createdSubscription, err := handler.SubRepo.Create(model)
+		createdSubscription, err := handler.SubService.Create(model)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return

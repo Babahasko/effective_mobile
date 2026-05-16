@@ -20,8 +20,18 @@ type DatabaseConfig struct {
 }
 
 func NewDatabaseConfig() *DatabaseConfig{
+	host := getString("DB_HOST", "localhost")
+    port := getString("DB_PORT", "5432")
+    user := getString("POSTGRES_USER", "postgres")
+    password := getString("POSTGRES_PASSWORD", "")
+    dbname := getString("POSTGRES_DB", "postgres")
+	sslmode := getString("DB_SSLMODE", "disable")
+	url := fmt.Sprintf(
+        "host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+        host, port, user, password, dbname, sslmode,
+    )
 	return &DatabaseConfig{
-		Url: getString("DB_URL", "localhost"),
+		Url: url,
 	}
 }
 

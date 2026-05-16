@@ -1,0 +1,218 @@
+openapi: 3.0.0
+info:
+  title: Subscription API
+  version: 1.0.0
+  
+servers:
+  - url: http://localhost:8081
+
+paths:
+  /sub:
+    post:
+      summary: Создать подписку
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscriptionCreateRequest'
+      responses:
+        '200':
+          description: Успешно создано
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionResponse'
+        '400':
+          description: Неверный запрос или ошибка валидации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Подписка уже существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSubscriptionAlreadyExists'
+
+    get:
+      summary: Список подписок
+      parameters:
+        - in: query
+          name: user_id
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: service_name
+          schema:
+            type: string
+        - in: query
+          name: price
+          schema:
+            type: integer
+        - in: query
+          name: start_date
+          schema:
+            type: string
+            example: "01-2025"
+      responses:
+        '200':
+          description: Успешно получен список подписок
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubscriptionResponse'
+
+  /sub/total:
+    get:
+      summary: Суммарная стоимость подписок
+      parameters:
+        - in: query
+          name: user_id
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: service_name
+          schema:
+            type: string
+        - in: query
+          name: start_date
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Успешно получена суммарная стоимость подписок
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TotalResponse'
+
+  /sub/{id}:
+    get:
+      summary: Получить подписку
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Успешно получена подписка по Id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionResponse'
+        '404':
+          description: Не найдено
+
+    patch:
+      summary: Обновить подписку
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscriptionUpdateRequest'
+      responses:
+        '200':
+          description: Успешно обновлена подписка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionResponse'
+
+    delete:
+      summary: Удалить подписку
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Удалено
+
+components:
+  schemas:
+    SubscriptionCreateRequest:
+      type: object
+      required: [service_name, price, user_id, start_date]
+      properties:
+        service_name:
+          type: string
+          example: "Mamba"
+        price:
+          type: integer
+        user_id:
+          type: string
+          format: uuid
+        start_date:
+          type: string
+          example: "01-2025"
+
+    SubscriptionUpdateRequest:
+      type: object
+      properties:
+        service_name:
+          type: string
+        price:
+          type: integer
+        user_id:
+          type: string
+          format: uuid
+        start_date:
+          type: string
+
+    SubscriptionResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        service_name:
+          type: string
+        user_id:
+          type: string
+          format: uuid
+        price:
+          type: integer
+        start_date:
+          type: string
+          pattern: '^\d{2}-\d{4}$'
+          example: 01-2025
+
+    TotalResponse:
+      type: object
+      properties:
+        total:
+          type: integer
+        user_id:
+          type: string
+          format: uuid
+        service_name:
+          type: string
+        start_date:
+          type: string
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "start_date parse error"
+    ErrorSubscriptionAlreadyExists:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "subscription already exists"

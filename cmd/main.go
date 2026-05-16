@@ -34,6 +34,7 @@ func App(conf *config.DatabaseConfig) http.Handler {
 
 	// Middlewares
 	stack := middleware.Chain(
+		middleware.CORS,
 		middleware.Logging,
 	)
 	return stack(router)

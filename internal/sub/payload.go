@@ -22,29 +22,37 @@ type SubscriptionUpdateRequest struct {
 }
 
 func (r *SubscriptionCreateRequest) ToModel() (*Subscription, error) {
-	t, err := time.Parse("01-2006", r.StartDate)
-	if err != nil {
-		return nil, fmt.Errorf("invalid start_date: %w", err)
-	}
-	return &Subscription{
+	sub := &Subscription{
 		ServiceName: r.ServiceName,
 		Price:       r.Price,
 		UserID:      r.UserId,
-		StartDate:   t,
-	}, nil
+	}
+	if r.StartDate != "" {
+        t, err := time.Parse("01-2006", r.StartDate)
+        if err != nil {
+            return nil, fmt.Errorf("invalid start_date: %w", err)
+        }
+        sub.StartDate = t
+    }
+
+	return sub, nil
 }
 
 func (r *SubscriptionUpdateRequest) ToModel() (*Subscription, error) {
-	t, err := time.Parse("01-2006", r.StartDate)
-	if err != nil {
-		return nil, fmt.Errorf("invalid start_date: %w", err)
-	}
-	return &Subscription{
+	sub := &Subscription{
 		ServiceName: r.ServiceName,
 		Price:       r.Price,
 		UserID:      r.UserId,
-		StartDate:   t,
-	}, nil
+	}
+	if r.StartDate != "" {
+        t, err := time.Parse("01-2006", r.StartDate)
+        if err != nil {
+            return nil, fmt.Errorf("invalid start_date: %w", err)
+        }
+        sub.StartDate = t
+    }
+
+	return sub, nil
 }
 
 type SubscriptionResponse struct {

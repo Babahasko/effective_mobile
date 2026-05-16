@@ -12,7 +12,11 @@ func init() {
 }
 
 func validateMonthYear(fl validator.FieldLevel) bool {
-    _, err := time.Parse("01-2006", fl.Field().String())
+    value := fl.Field().String()
+    if value == "" {
+        return true
+    }
+    _, err := time.Parse("01-2006", value)
     return err == nil
 }
 

@@ -37,12 +37,12 @@ func (handler *SubscriptionHandler) Create() http.HandlerFunc {
 		}
 		model, err := body.ToModel()
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			res.JsonError(w, err.Error(), http.StatusBadRequest)
             return
 		}
 		createdSubscription, err := handler.SubService.Create(model)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			res.JsonError(w, err.Error(), http.StatusConflict)
 			return
 		}
 		res.Json(w, createdSubscription, 201)

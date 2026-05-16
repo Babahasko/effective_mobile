@@ -133,7 +133,7 @@ func (handler *SubscriptionHandler) Update() http.HandlerFunc {
                 res.JsonError(w, ErrSubNotFound.Error(), http.StatusNotFound)
                 return
             }
-			res.JsonError(w, err.Error(), http.StatusBadRequest)
+			res.JsonError(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		res.Json(w, NewSubscriptionResponse(sub), http.StatusOK)
@@ -153,7 +153,7 @@ func (handler *SubscriptionHandler) Delete() http.HandlerFunc {
                 res.JsonError(w, ErrSubNotFound.Error(), http.StatusNotFound)
                 return
             }
-			res.JsonError(w, err.Error(), http.StatusBadRequest)
+			res.JsonError(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		res.Json(w, fmt.Sprintf("subscription id: %v deleted", id), http.StatusOK)

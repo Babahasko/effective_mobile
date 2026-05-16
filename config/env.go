@@ -1,19 +1,18 @@
 package config
 
 import (
-	"log"
+	"fmt"
 	"os"
 	"strconv"
 
 	"github.com/joho/godotenv"
 )
 
-func Init() {
+func Init() error {
 	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file")
-		return
+		return fmt.Errorf("failed to load .env: %w", err)
 	}
-	log.Println(".env file loaded")
+	return nil
 }
 
 type DatabaseConfig struct {
@@ -30,6 +29,7 @@ type LogConfig struct {
 	Level int
 	Format string
 	LevelStr string
+	FilePath string
 }
 
 func NewLogConfig() *LogConfig{
@@ -37,7 +37,15 @@ func NewLogConfig() *LogConfig{
 		Level: getInt("LOG_LEVEL", 0),
 		LevelStr: getString("LOG_LEVEL_STR", "info"),
 		Format: getString("LOG_FORMAT", "json"),
+		FilePath: getString("LOG_PATH", "logs/app.log"),
 	}
+}
+
+func DefaultLogConfig() *LogConfig {
+    return &LogConfig{
+        Level:  0, // Info
+        Format: "console",
+    }
 }
 
 func getString(key, defaultValue string) string {

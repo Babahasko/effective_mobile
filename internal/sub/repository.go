@@ -26,7 +26,7 @@ func (repo *SubscriptionRepository) Create(sub *Subscription) (*Subscription, er
 	return sub, nil
 }
 
-func (repo *SubscriptionRepository) Read(id uint64) (*Subscription, error) {
+func (repo *SubscriptionRepository) Read(id uint) (*Subscription, error) {
 	var sub *Subscription
 	result := repo.Database.DB.First(&sub, "id = ?", id)
 	if result.Error != nil {

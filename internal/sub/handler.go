@@ -4,6 +4,7 @@ import (
 	"effective_mobile/pkg/req"
 	"effective_mobile/pkg/res"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -113,6 +114,22 @@ func (handler *SubscriptionHandler) Update() http.HandlerFunc {
 }
 func (handler *SubscriptionHandler) Delete() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		idString := r.PathValue("id")
+		parsedid, err := strconv.ParseUint(idString, 10, 64)
+		id := uint(parsedid)
+		if err != nil {
+			res.JsonError(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		if err := handler.SubRepo.Delete(id); err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+                res.JsonError(w, ErrSubNotFound.Error(), http.StatusNotFound)
+                return
+            }
+			res.JsonError(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		res.Json(w, fmt.Sprintf("subscription id: %v deleted", id), http.StatusOK)
 	}
 }
 func (handler *SubscriptionHandler) List() http.HandlerFunc {

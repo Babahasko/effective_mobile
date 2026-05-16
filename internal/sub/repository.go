@@ -46,6 +46,17 @@ func (repo *SubscriptionRepository) Update(sub *Subscription) (*Subscription, er
 	return sub, nil
 }
 
+func (repo *SubscriptionRepository) Delete(id uint) error {
+	result := repo.Database.DB.Delete(&Subscription{}, id)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+        return gorm.ErrRecordNotFound
+    }
+	return nil
+}
+
 func (repo *SubscriptionRepository) Exists(serviceName string, userID uuid.UUID) (bool, error) {
     var count int64
     err := repo.Database.Model(&Subscription{}).

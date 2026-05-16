@@ -2,7 +2,6 @@ package db
 
 import (
 	"effective_mobile/config"
-
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

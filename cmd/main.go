@@ -3,6 +3,7 @@ package main
 import (
 	"effective_mobile/config"
 	"effective_mobile/internal/sub"
+	"effective_mobile/internal/migrate"
 	"effective_mobile/logger"
 	"effective_mobile/pkg/db"
 	"effective_mobile/pkg/middleware"
@@ -14,11 +15,12 @@ import (
 func App(conf *config.DatabaseConfig) http.Handler {
 
 	db := db.NewDB(conf)
+	migrate.Migrate(db.DB)
+
 	router := http.NewServeMux()
 
 	//Repositories
 	subRepository := sub.NewSubscriptionRepository(db)
-	// statRepository := stat.NewStatRepository(db) // пока под вопросом
 	
 	//Services
 	subService := sub.NewSubscriptionService(subRepository)
@@ -28,9 +30,6 @@ func App(conf *config.DatabaseConfig) http.Handler {
 		SubRepo: subRepository,
 		SubService: subService,
 	})
-	// stat.NewStatHandler(router, &stat.StatHandlerDeps{
-	// 	StatRepository: statRepository,
-	// }) ? пока под вопросом
 
 	// Middlewares
 	stack := middleware.Chain(

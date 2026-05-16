@@ -1,17 +1,20 @@
+name: effective_mobile
+
 services:
   app:
-      build:
-        context: ..
-        dockerfile: docker/Dockerfile
-      env_file:
-        - ../.env
-      ports:
-        - "8081:8081"
-      depends_on:
-        postgres:
-          condition: service_healthy
+    container_name: app
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    env_file:
+      - ../.env
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
   postgres:
-    container_name: effective_mobile_db
+    container_name: db
     image: postgres:latest
     env_file:
       - ../.env
@@ -30,6 +33,7 @@ services:
       retries: 5
   swagger-ui:
     image: swaggerapi/swagger-ui
+    container_name: swagga
     ports:
       - "8082:8080"
     environment:

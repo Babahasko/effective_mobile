@@ -1,6 +1,10 @@
 package sub
 
-import "net/http"
+import (
+	"effective_mobile/pkg/req"
+	"effective_mobile/pkg/res"
+	"net/http"
+)
 
 type SubscriptionHandlerDeps struct {
 	SubRepo *SubscriptionRepository
@@ -24,6 +28,21 @@ func NewSubscriptionHandler(router *http.ServeMux, deps *SubscriptionHandlerDeps
 
 func (handler *SubscriptionHandler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		body, err := req.HandleBody[SubscriptionCreateRequest](&w, r)
+		if err != nil {
+			return
+		}
+		model, err := body.ToModel()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+            return
+		}
+		createdSubscription, err := handler.SubRepo.Create(model)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		res.Json(w, createdSubscription, 201)
 	}
 }
 func (handler *SubscriptionHandler) Read() http.HandlerFunc {

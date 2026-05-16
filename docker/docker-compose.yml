@@ -20,7 +20,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - ./postgres_data:/data/postgres
+      - postgres_data:/data/postgres
     ports:
       - "5432:5432"
     healthcheck:
@@ -35,6 +35,6 @@ services:
     environment:
       SWAGGER_JSON: /swagger.yaml
     volumes:
-      - ../swagger.yaml:/swagger.yaml
+      - ../swagger.yaml:/swagger.yaml:ro
 volumes:
   postgres_data:

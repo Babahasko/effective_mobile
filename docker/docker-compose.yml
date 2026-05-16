@@ -7,6 +7,9 @@ services:
         - ../.env
       ports:
         - "8081:8081"
+      depends_on:
+        postgres:
+          condition: service_healthy
   postgres:
     container_name: effective_mobile_db
     image: postgres:latest
@@ -16,12 +19,15 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-
-      PG_DATA: /data/postgres
     volumes:
       - ./postgres_data:/data/postgres
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   swagger-ui:
     image: swaggerapi/swagger-ui
     ports:
@@ -29,6 +35,6 @@ services:
     environment:
       SWAGGER_JSON: /swagger.yaml
     volumes:
-      - ./swagger.yaml:/swagger.yaml
+      - ../swagger.yaml:/swagger.yaml
 volumes:
   postgres_data:

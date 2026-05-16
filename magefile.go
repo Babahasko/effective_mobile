@@ -1,27 +1,24 @@
 //go:build mage
-
 package main
 
 import (
     "github.com/magefile/mage/sh"
 )
+const composeFile = "docker/docker-compose.yml"
+const envFile = ".env"
 
-// Запустить все сервисы
 func Up() error {
-    return sh.Run("docker-compose", "-f", "docker/docker-compose.yml", "up", "-d")
+    return sh.Run("docker", "compose", "--env-file", envFile, "-f", composeFile, "up", "-d")
 }
 
-// Остановить все сервисы
 func Down() error {
-    return sh.Run("docker-compose", "-f", "docker/docker-compose.yml", "down")
+    return sh.Run("docker", "compose", "--env-file", envFile, "-f", composeFile, "down")
 }
 
-// Запустить миграции
-func Migrate() error {
-    return sh.Run("docker-compose", "-f", "docker/docker-compose.yml", "run", "--rm", "app", "go", "run", "./cmd/migrations/main.go")
-}
-
-// Пересобрать и запустить
 func Build() error {
-    return sh.Run("docker-compose", "-f", "docker/docker-compose.yml", "up", "-d", "--build")
+    return sh.Run("docker", "compose", "--env-file", envFile, "-f", composeFile, "up", "-d", "--build")
+}
+
+func Migrate() error {
+    return sh.Run("docker", "compose", "--env-file", envFile, "-f", composeFile, "run", "--rm", "app", "go", "run", "./cmd/migrations/main.go")
 }

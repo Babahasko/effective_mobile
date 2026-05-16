@@ -9,6 +9,6 @@ FROM alpine:latest
 WORKDIR /app
 COPY --from=builder /app/main .
 COPY .env .
-
+RUN mkdir -p logs
 EXPOSE 8081
 CMD ["./main"]

@@ -3,7 +3,6 @@ module effective_mobile
 go 1.26.3
 
 require (
-	github.com/Babahasko/stat_api v0.0.0-20250316083052-494a29a2522d
 	github.com/go-playground/validator/v10 v10.30.2
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1

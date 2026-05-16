@@ -1,5 +1,3 @@
-github.com/Babahasko/stat_api v0.0.0-20250316083052-494a29a2522d h1:ZJggM+/ccGSIfTq3BjAGn5S6Ohs9QtTW1CpEucr2oBM=
-github.com/Babahasko/stat_api v0.0.0-20250316083052-494a29a2522d/go.mod h1:TfL3m2Kpz7E5Klsvq0St8h7P0ALjBpDkS0RivXwC+sM=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

@@ -9,14 +9,14 @@ import (
 
 type SubscriptionCreateRequest struct {
 	ServiceName string    `json:"service_name" validate:"required"`
-	Price       uint      `json:"price" validate:"required"`
+	Price       int       `json:"price" validate:"min=0"`
 	UserId      uuid.UUID `json:"user_id" validate:"required,uuid"`
 	StartDate   string    `json:"start_date" validate:"required,month_year"`
 }
 
 type SubscriptionUpdateRequest struct {
 	ServiceName string    `json:"service_name"`
-	Price       uint      `json:"price"`
+	Price       int       `json:"price" validate:"min=0"`
 	UserId      uuid.UUID `json:"user_id"`
 	StartDate   string    `json:"start_date" validate:"month_year"`
 }
@@ -48,26 +48,26 @@ func (r *SubscriptionUpdateRequest) ToModel() (*Subscription, error) {
 }
 
 type SubscriptionResponse struct {
-    ID          uint      `json:"id"`
-    ServiceName string    `json:"service_name"`
-    UserID      uuid.UUID `json:"user_id"`
-    Price       uint      `json:"price"`
-    StartDate   string    `json:"start_date"`
+	ID          uint      `json:"id"`
+	ServiceName string    `json:"service_name"`
+	UserID      uuid.UUID `json:"user_id"`
+	Price       int       `json:"price"`
+	StartDate   string    `json:"start_date"`
 }
 
 type TotalResponse struct {
-    Total       uint       `json:"total"`
-    UserID      *uuid.UUID `json:"user_id,omitempty"`
-    ServiceName *string    `json:"service_name,omitempty"`
-    StartDate   *string    `json:"start_date,omitempty"`
+	Total       uint       `json:"total"`
+	UserID      *uuid.UUID `json:"user_id,omitempty"`
+	ServiceName *string    `json:"service_name,omitempty"`
+	StartDate   *string    `json:"start_date,omitempty"`
 }
 
 func NewSubscriptionResponse(sub *Subscription) *SubscriptionResponse {
-    return &SubscriptionResponse{
-        ID:          sub.ID,
-        ServiceName: sub.ServiceName,
-        UserID:      sub.UserID,
-        Price:       sub.Price,
-        StartDate:   sub.StartDate.Format("01-2006"),
-    }
+	return &SubscriptionResponse{
+		ID:          sub.ID,
+		ServiceName: sub.ServiceName,
+		UserID:      sub.UserID,
+		Price:       sub.Price,
+		StartDate:   sub.StartDate.Format("01-2006"),
+	}
 }

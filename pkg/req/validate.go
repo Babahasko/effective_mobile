@@ -1,9 +1,7 @@
 package req
 
-import "github.com/go-playground/validator/v10"
+import "effective_mobile/internal/validator"
 
 func IsValid[T any](payload T) error {
-	validate := validator.New()
-	err := validate.Struct(payload)
-	return err
+	return validator.Validate(payload)
 }
